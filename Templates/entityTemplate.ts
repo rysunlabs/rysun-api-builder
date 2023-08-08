@@ -1,8 +1,8 @@
 import { fieldTemplate } from "./fieldTemplate"
 
-export const entityTemplate = (filename, fields) => {
+export const entityTemplate = (filename: string, fields: any) => {
 
-    const importTemplates = (value) => {
+    const importTemplates = (value: any) => {
         let template = ``
 
         for (let i in value) {

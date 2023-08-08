@@ -1,4 +1,4 @@
-export const prismaTemplate = (dbInfo) => {
+export const prismaTemplate = (dbInfo: any) => {
     let template = `generator client {
     provider = "prisma-client-js"
     previewFeatures = ["fullTextSearch", "fullTextIndex"]

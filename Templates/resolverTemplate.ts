@@ -1,7 +1,7 @@
-export const resolverTemplate = (name, fields) => {
+export const resolverTemplate = (name: string, fields: any) => {
     const fileName = name.charAt(0).toUpperCase() + name.slice(1)
-    let primaryType: string
-    let primaryName: string
+    let primaryType: string = ""
+    let primaryName: string = ""
 
     // get the primary key and its type
     for (let i in fields) {
@@ -18,7 +18,7 @@ export const resolverTemplate = (name, fields) => {
     }
 
     // check that required field is exist or not if exist then add the 'create' and 'update' methods in template.
-    const checkCreate = (requireCount) => {
+    const checkCreate = (requireCount: number) => {
         let createTemplate = ``
         if (requireCount > 0) {
             createTemplate += `\n\t@Mutation(() => ${fileName})
@@ -31,7 +31,7 @@ export const resolverTemplate = (name, fields) => {
         }
         return createTemplate
     }
-    const checkUpdate = (requireCount) => {
+    const checkUpdate = (requireCount: number) => {
         let updateTemplate = ``
         if (requireCount > 0) {
             updateTemplate += `\n\t@Mutation(() => ${fileName})

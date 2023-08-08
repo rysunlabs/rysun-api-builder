@@ -1,8 +1,8 @@
-export const controllerTemplate = (name, fields) => {
+export const controllerTemplate = (name: string, fields: any) => {
     const fileName = name.charAt(0).toUpperCase() + name.slice(1)
     let copyClassName = fileName
-    let primaryType: string
-    let primaryName: string
+    let primaryType: string = ""
+    let primaryName: string = ""
 
     // get the primary key and its type
     for (let i in fields) {
@@ -22,7 +22,7 @@ export const controllerTemplate = (name, fields) => {
     }
 
     // check that required field is exist or not if exist then add the 'create' and 'update' methods in template.
-    const checkCreate = (requireCount) => {
+    const checkCreate = (requireCount: number) => {
         let createTemplate = ``
         if (requireCount > 0) {
             createTemplate += `\n\t@Post('create')
@@ -35,7 +35,7 @@ export const controllerTemplate = (name, fields) => {
         }
         return createTemplate
     }
-    const checkUpdate = (requireCount) => {
+    const checkUpdate = (requireCount: number) => {
         let updateTemplate = ``
         if (requireCount > 0) {
             updateTemplate += `\n\t@Patch(':${primaryName}')

@@ -1,4 +1,4 @@
-export const envTemplate = (dbInfo) => {
+export const envTemplate = (dbInfo: any) => {
     let template = ``
 
     // template for env file.

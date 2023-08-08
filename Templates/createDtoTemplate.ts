@@ -1,4 +1,4 @@
-export const createDtoTemplate = (name, fields, apiType) => {
+export const createDtoTemplate = (name: string, fields: any, apiType: any) => {
     const fileName = name.charAt(0).toUpperCase() + name.slice(1)
     let copyClassName = fileName
     if (fileName.split("-")[1] === "copy") {
@@ -14,7 +14,7 @@ export const createDtoTemplate = (name, fields, apiType) => {
     }
 
     // create fields template according the api type eg. 'GraphQL' or 'RestAPI'.
-    const fieldsTemplate = (element) => {
+    const fieldsTemplate = (element: any) => {
         let fieldTemplate = ``
         for (let i in element) {
             if (element[i]['allowNull'] && element[i]["default"]?.name !== "autoincrement") {
@@ -37,7 +37,7 @@ export const createDtoTemplate = (name, fields, apiType) => {
     }
 
     // check for ENUM type if it exist then add the Import in template
-    const checkEnumImport = (element) => {
+    const checkEnumImport = (element: any) => {
         let fieldTemplate = ``
         for (let i in element) {
             if (element[i]['allowNull'] && i !== 'id') {

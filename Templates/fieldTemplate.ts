@@ -1,6 +1,6 @@
 
 // this function create the fields template.
-const generateColumnTemplate = (filename, value, currentcolumn) => {
+const generateColumnTemplate = (filename: string, value: any, currentColumn: any) => {
     let template = ``
 
     if (value['kind'] === "enum") {
@@ -9,7 +9,7 @@ const generateColumnTemplate = (filename, value, currentcolumn) => {
         } else {
             template += `\t@Field(() => ${value['type'].charAt(0).toUpperCase() + value['type'].slice(1)})\n`
         }
-        template += `\t${currentcolumn}: ${filename}_${currentcolumn}\n\n`
+        template += `\t${currentColumn}: ${filename}_${currentColumn}\n\n`
     }
     else {
         if (!value['allowNull']) {
@@ -17,12 +17,12 @@ const generateColumnTemplate = (filename, value, currentcolumn) => {
         } else {
             template += `\t@Field()\n`
         }
-        template += `\t${currentcolumn}: ${value['type']}\n\n`
+        template += `\t${currentColumn}: ${value['type']}\n\n`
     }
     return template
 }
 
-export const fieldTemplate = (filename, field) => {
+export const fieldTemplate = (filename: string, field: any) => {
     let template = ``
 
     for (let i in field) {

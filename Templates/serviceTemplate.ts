@@ -1,11 +1,11 @@
-export const serviceTemplate = (name, fields, apiType) => {
+export const serviceTemplate = (name: string, fields: any, apiType: string) => {
     const fileName = name.charAt(0).toUpperCase() + name.slice(1)
     let copyClassName = fileName
 
     name = name.charAt(0).toLowerCase() + name.slice(1)
 
-    let primaryType: string
-    let primaryName: string
+    let primaryType: string = ""
+    let primaryName: string = ""
 
     // get the primary key and its type
     for (let i in fields) {
@@ -26,7 +26,7 @@ export const serviceTemplate = (name, fields, apiType) => {
         }
     }
     reference = [... new Set(reference)]
-    const importTemplates = (type) => {
+    const importTemplates = (type: string) => {
         let template = ``
         if (type === "GraphQL") {
             template += `import { Create${copyClassName}Input } from './dto/create-${name}.input';
@@ -51,7 +51,7 @@ import { Filter${copyClassName}Dto } from './dto/filter-${name}.dto';\n`
     }
 
     // check that required field is exist or not if exist then add the 'create' and 'update' methods with code in template.
-    const checkCreate = (requireCount) => {
+    const checkCreate = (requireCount: number) => {
         let createTemplate = ``
         if (requireCount > 0) {
             createTemplate += `\n\tasync create(create${copyClassName}${checkGraphQL}: Create${copyClassName}${checkGraphQL}) {
@@ -77,7 +77,7 @@ import { Filter${copyClassName}Dto } from './dto/filter-${name}.dto';\n`
         }
         return createTemplate
     }
-    const checkUpdate = (requireCount) => {
+    const checkUpdate = (requireCount: number) => {
         let updateTemplate = ``
         if (requireCount > 0) {
             updateTemplate += `\n\tasync update(${primaryName}: ${primaryType}, update${copyClassName}${checkGraphQL}: Update${copyClassName}${checkGraphQL}) {

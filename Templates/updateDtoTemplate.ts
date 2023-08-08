@@ -1,4 +1,4 @@
-export const updateDtoTemplate = (name, fields, apiType) => {
+export const updateDtoTemplate = (name: string, fields: any, apiType: string) => {
   const fileName = name.charAt(0).toUpperCase() + name.slice(1)
   let copyClassName = fileName
   if (fileName.split("-")[1] === "copy") {
@@ -24,7 +24,7 @@ export const updateDtoTemplate = (name, fields, apiType) => {
   }
 
   // this function check that any fields is exist in table or not.
-  const checkRequiredFields = (requireCount) => {
+  const checkRequiredFields = (requireCount: number) => {
     let requireTemplate = ``
     if (requireCount > 0) {
       requireTemplate += `import { Field, InputType } from '@nestjs/graphql';
@@ -39,7 +39,7 @@ export const updateDtoTemplate = (name, fields, apiType) => {
   }
 
   // this function returns the fields with types.
-  const checkForFields = (requireCount) => {
+  const checkForFields = (requireCount: number) => {
     let requireTemplate = ``
     if (requireCount > 0) {
       requireTemplate += `\t@Field()

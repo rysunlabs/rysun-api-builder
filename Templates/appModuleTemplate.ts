@@ -1,4 +1,4 @@
-export const appModuleTemplate = (value) => {
+export const appModuleTemplate = (value: any) => {
     let template = ``
 
     let importsTemplate = ``

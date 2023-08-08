@@ -1,4 +1,4 @@
-export const moduleTemplate = (name, fields, apiType) => {
+export const moduleTemplate = (name: string, fields: any, apiType: string) => {
     const fileName = name.charAt(0).toUpperCase() + name.slice(1)
     let copyClassName = fileName
     if (fileName.split("-")[1] === "copy") {
@@ -19,7 +19,7 @@ export const moduleTemplate = (name, fields, apiType) => {
     })
 
     // this function create the import template.
-    const importTemplates = (type, fname) => {
+    const importTemplates = (type: string, fname: string) => {
         let template = ``
         if (type === "GraphQL") {
             template += `import { GraphQLModule } from '@nestjs/graphql';\nimport { ${fname}Resolver }  from './${fname}.resolver';
@@ -33,7 +33,7 @@ import { ApolloDriverConfig, ApolloDriver } from '@nestjs/apollo';`
     }
 
     // this function create the providers template.
-    const providersTemplate = (fname, type) => {
+    const providersTemplate = (fname: string, type: string) => {
         let template = ``
         if (type === "RestAPI") {
             template += `\tcontrollers: [${fname}Controller],\n\tproviders: [${fname}Service],`
@@ -45,7 +45,7 @@ import { ApolloDriverConfig, ApolloDriver } from '@nestjs/apollo';`
     }
 
     // add GraphQl module if the api type is GraphQL
-    const checkGraphQlModule = (type) => {
+    const checkGraphQlModule = (type: string) => {
         let template = ``
         if (type === "GraphQL") {
             template += `\n\t\tGraphQLModule.forRoot<ApolloDriverConfig>({

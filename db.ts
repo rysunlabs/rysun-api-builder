@@ -26,7 +26,7 @@ interface DatabaseInfo {
 export const dbConnect = async (dbInfo: DatabaseInfo) => {
 
     // this function create all files with all structure according to database tables
-    const createAllFiles = (name, fields) => {
+    const createAllFiles = (name: string, fields: any) => {
         let isUnique: boolean = true
         for (let i in fields) {
             if (fields[i]["default"]?.name === "autoincrement" && fields[i]["unique"] && fields[i]["allowNull"] || fields[i]["default"]?.name === "autoincrement" && fields[i]["allowNull"] || fields[i]["unique"] && fields[i]["allowNull"] || fields[i]["allowNull"] || fields[i]["unique"]) {
@@ -75,13 +75,13 @@ export const dbConnect = async (dbInfo: DatabaseInfo) => {
         }
     }
 
-    const generate = (isDiffrence: boolean, diffData?, actualData?) => {
+    const generate = (isDiffrence: boolean, diffData?: any, actualData? : any) => {
         const Prisma = require("@prisma/client")
         // @ts-ignore
         const data = Prisma.dmmf.datamodel.models
 
         const modelNames = Prisma.ModelName
-        let dataObj = {}
+        let dataObj: any = {}
         for (let i in modelNames) {
             if (actualData) {
                 for (let a of actualData) {
@@ -101,7 +101,7 @@ export const dbConnect = async (dbInfo: DatabaseInfo) => {
         }
 
         // this function check the datatypes for the fields
-        const checkTypes = (value) => {
+        const checkTypes = (value: any) => {
             if (value.includes("Int") || value.includes("Float") || value.includes("Decimal")) {
                 return 'number'
             }
@@ -119,12 +119,12 @@ export const dbConnect = async (dbInfo: DatabaseInfo) => {
             }
         }
 
-        let models = {}
+        let models: any = {}
 
         for (let i in data) {
             // here all fields object create where all the necessary value are stores
-            const fields = {}
-            data[i]["fields"].forEach(d => {
+            const fields: any = {}
+            data[i]["fields"].forEach((d: any) => {
                 if (d["kind"] !== "object") {
 
                     d["type"] = checkTypes(d["type"])
@@ -203,7 +203,7 @@ export const dbConnect = async (dbInfo: DatabaseInfo) => {
         // get the difference between schema.prisma and schema.back.prisma file if schema.back.prisma is exist.
         exec("fc schema.back.prisma ./prisma/schema.prisma", (err, stdout, stderr) => {
             const value = stdout.split(`*****\r\n\r\n*****`)
-            const diffData = []
+            const diffData: any = []
             for (let i in value) {
                 diffData.push(value[i].split(`***** ./PRISMA/SCHEMA.PRISMA\r\n`)[1]?.split("*****")[0])
             }

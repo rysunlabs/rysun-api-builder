@@ -1,20 +1,32 @@
 {
-  "name": "prisma-apigenerator",
-  "version": "1.0.9",
+  "name": "rysun-api-builder",
+  "version": "1.0.0",
   "description": "Auto generates the CRUD endpoints for mysql, postgres and sqlserver using prisma",
-  "main": "dist/index.js",
+  "main": "./lib/cjs/index.js",
   "bin": {
-    "generatePrismaAPI": "./dist/index.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/kcsplcompusoft/Prisma-apigenerator.git"
+    "generatePrismaAPI": "./lib/cjs/index.js"
   },
   "scripts": {
-    "generate": "tsc && node ./dist/index.js"
+    "version-select": "version-select",
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
+    "build:watch": "tsc -w"
   },
   "keywords": [],
-  "author": "Jayrajsinh zala",
+  "files": [
+    "lib/"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rysuncommunity/rysun-api-builder"
+  },
+  "bugs": {
+    "url": "https://github.com/rysuncommunity/rysun-api-builder/issues"
+  },
+  "homepage": "https://github.com/rysuncommunity/rysun-api-builder#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": "coderyser",
   "license": "ISC",
   "devDependencies": {
     "@types/inquirer": "^9.0.2",

@@ -1,4 +1,4 @@
-export const filterDtoTemplate = (name, apiType) => {
+export const filterDtoTemplate = (name: string, apiType: any) => {
     const fileName = name.charAt(0).toUpperCase() + name.slice(1)
     let copyClassName = fileName
     if (fileName.split("-")[1] === "copy") {
