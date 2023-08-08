@@ -11,7 +11,19 @@
     "build": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
     "build:watch": "tsc -w"
   },
-  "keywords": [],
+  "keywords": [
+    "API",
+    "Database",
+    "CRUD Endpoints",
+    "Prisma api",
+    "prisma",
+    "api-generator",
+    "Postgres",
+    "Mysql",
+    "Sql-server",
+    "Api-generator-prisma",
+    "crud-generator"
+  ],
   "files": [
     "lib/"
   ],
