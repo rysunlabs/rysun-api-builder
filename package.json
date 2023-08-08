@@ -1,5 +1,5 @@
 {
-  "name": "rysun-api-builder",
+  "name": "@rysun/api-builder",
   "version": "1.0.0",
   "description": "Auto generates the CRUD endpoints for mysql, postgres and sqlserver using prisma",
   "main": "./lib/cjs/index.js",
@@ -42,7 +42,7 @@
   "author": "coderyser",
   "license": "ISC",
   "devDependencies": {
-    "@types/inquirer": "^9.0.2",
+    "@types/inquirer": "9.0.2",
     "typescript": "^5.1.3"
   },
   "dependencies": {
