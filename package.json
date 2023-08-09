@@ -39,7 +39,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "author": "coderyser",
+  "author": "rysun",
   "license": "ISC",
   "devDependencies": {
     "@types/inquirer": "9.0.2",
