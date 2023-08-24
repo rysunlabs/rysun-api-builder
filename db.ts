@@ -29,7 +29,7 @@ export const dbConnect = async (dbInfo: DatabaseInfo) => {
     const createAllFiles = (name: string, fields: any) => {
         let isUnique: boolean = true
         for (let i in fields) {
-            if (fields[i]["default"]?.name === "autoincrement" && fields[i]["unique"] && fields[i]["allowNull"] || fields[i]["default"]?.name === "autoincrement" && fields[i]["allowNull"] || fields[i]["unique"] && fields[i]["allowNull"] || fields[i]["allowNull"] || fields[i]["unique"]) {
+            if (fields[i]["isPrimary"] && !fields[i]["allowNull"]) {
                 isUnique = true
                 break;
             }
@@ -75,12 +75,13 @@ export const dbConnect = async (dbInfo: DatabaseInfo) => {
         }
     }
 
-    const generate = (isDiffrence: boolean, diffData?: any, actualData? : any) => {
-        const Prisma = require("@prisma/client")
+    const generate = async (isDiffrence: boolean, diffData?: any, actualData?: any) => {
+        const { PrismaClient } = require("@prisma/client")
+        const prisma = require("@prisma/client")
         // @ts-ignore
-        const data = Prisma.dmmf.datamodel.models
+        const prismaClient = new PrismaClient()
+        const modelNames = prisma.ModelName
 
-        const modelNames = Prisma.ModelName
         let dataObj: any = {}
         for (let i in modelNames) {
             if (actualData) {
@@ -91,27 +92,27 @@ export const dbConnect = async (dbInfo: DatabaseInfo) => {
                 }
             }
         }
-        let diffmodelList = []
+        let diffModelList = []
         for (let i in dataObj) {
             for (let a of diffData) {
                 if (dataObj[i].includes(a)) {
-                    diffmodelList.push(i)
+                    diffModelList.push(i)
                 }
             }
         }
 
         // this function check the datatypes for the fields
         const checkTypes = (value: any) => {
-            if (value.includes("Int") || value.includes("Float") || value.includes("Decimal")) {
+            if (value.includes("Int") || value.includes("int") || value.includes("Float") || value.includes("Decimal")) {
                 return 'number'
             }
-            else if (value.includes("Date") || value.includes("Time")) {
+            else if (value.includes("Date") || value.includes("timestamp") || value.includes("Time") || value.includes("datetime")) {
                 return 'Date'
             }
-            else if (value.includes("Boolean") || value.includes("tinyInt")) {
+            else if (value.includes("Boolean") || value.includes("tinyInt") || value.includes('tinyint')) {
                 return 'boolean'
             }
-            else if (value.includes('varchar') || value.includes('text') || value.includes('String')) {
+            else if (value.includes('varchar') || value.includes('text') || value.includes('String') || value.includes('string')) {
                 return 'string'
             }
             else {
@@ -120,44 +121,51 @@ export const dbConnect = async (dbInfo: DatabaseInfo) => {
         }
 
         let models: any = {}
-
-        for (let i in data) {
-            // here all fields object create where all the necessary value are stores
+        let tName: any
+        for (tName of Object.values(modelNames)) {
+            const data = await prismaClient.$queryRawUnsafe(`SHOW COLUMNS from ${tName}`)
             const fields: any = {}
-            data[i]["fields"].forEach((d: any) => {
-                if (d["kind"] !== "object") {
-
-                    d["type"] = checkTypes(d["type"])
-                    if (d["kind"] === "enum") {
-                        d["type"] = "string"
-                    }
-                    fields[d["name"]] = {
-                        type: d["type"],
-                        kind: d["kind"],
-                        default: d["default"],
-                        allowNull: d["isRequired"],
-                    }
+            for (let i in data) {
+                // here all fields object create where all the necessary value are stores
+                data[i]["Type"] = checkTypes(data[i]["Type"])
+                
+                if (data[i]["Type"].includes('enum')) {
+                    data[i]["Type"] = "string"
+                    data[i]['kind'] = "enum"
                 }
-            })
+                data[i]["Null"] = data[i]["Null"] === 'YES'
+                if (data[i]["Null"] === 'NO') {
+                    data[i]["Null"] = false
+                }
+                fields[data[i]["Field"]] = {
+                    type: data[i]["Type"],
+                    kind: data[i]["kind"],
+                    isPrimary: data[i]["Key"] === 'PRI' ? true : false,
+                    default: data[i]["Default"],
+                    allowNull: data[i]["Null"],
+                }
 
-            let name = data[i]["name"]
 
+            }
             if (isDiffrence) {
-                for (let i of diffmodelList) {
-                    if (name === i) {
-                        models[name] = `${name.charAt(0).toUpperCase() + name.slice(1)}`
-                        createAllFiles(name, fields)
+                for (let i of diffModelList) {
+                    if (tName === i) {
+                        models[tName] = `${tName.charAt(0).toUpperCase() + tName.slice(1)}`
+                        createAllFiles(tName, fields)
                     }
                 }
-                if (!fs.existsSync(`./src/${name}`)) {
-                    models[name] = `${name.charAt(0).toUpperCase() + name.slice(1)}`
-                    createAllFiles(name, fields)
+                
+                if (!fs.existsSync(`./src/${tName}`)) {
+                    console.log("tName error",tName);
+                    console.log("models error",models);
+                    models[tName] = `${tName.charAt(0).toUpperCase() + tName.slice(1)}`
+                    createAllFiles(tName, fields)
                 }
             }
             else {
-                if (!fs.existsSync(`./src/${name}`)) {
-                    models[name] = `${name.charAt(0).toUpperCase() + name.slice(1)}`
-                    createAllFiles(name, fields)
+                if (!fs.existsSync(`./src/${tName}`)) {
+                    models[tName] = `${tName.charAt(0).toUpperCase() + tName.slice(1)}`
+                    createAllFiles(tName, fields)
                 }
             }
         }
