@@ -1,6 +1,10 @@
 # @rysun/api-builder
 
-This package Auto generates the CRUD endpoints for mysql, postgres and sqlserver using prisma and it also support the apollo GraphQL and swagger. Swagger is auto generates when user selects the RestAPI type.
+While actively working with databases, this efficient and time-saving package helps developers to auto-generate the CRUD endpoints for MySQL, Postgres, and SQL servers using Prisma. It also supports GraphQL and Swagger tools in API development.  
+
+To generate CRUD endpoints in Swagger, the user has to select the RestAPI type.  
+
+The api-builder runs on NodeJS, and it is only for NestJS projects.
 
 ## Installation & Usage
 
