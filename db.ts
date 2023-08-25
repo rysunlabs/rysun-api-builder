@@ -76,11 +76,11 @@ export const dbConnect = async (dbInfo: DatabaseInfo) => {
     }
 
     const generate = async (isDiffrence: boolean, diffData?: any, actualData?: any) => {
-        const { PrismaClient } = require("@prisma/client")
-        const prisma = require("@prisma/client")
+        const { PrismaClient } = await import("@prisma/client")
+        const prisma:any = await import("@prisma/client")
         // @ts-ignore
-        const prismaClient = new PrismaClient()
-        const modelNames = prisma.ModelName
+        const prismaClient = new PrismaClient()        
+        const modelNames = prisma.Prisma.ModelName
 
         let dataObj: any = {}
         for (let i in modelNames) {
@@ -123,7 +123,7 @@ export const dbConnect = async (dbInfo: DatabaseInfo) => {
         let models: any = {}
         let tName: any
         for (tName of Object.values(modelNames)) {
-            const data = await prismaClient.$queryRawUnsafe(`SHOW COLUMNS from ${tName}`)
+            const data: any = await prismaClient.$queryRawUnsafe(`SHOW COLUMNS from ${tName}`)
             const fields: any = {}
             for (let i in data) {
                 // here all fields object create where all the necessary value are stores
@@ -156,8 +156,6 @@ export const dbConnect = async (dbInfo: DatabaseInfo) => {
                 }
                 
                 if (!fs.existsSync(`./src/${tName}`)) {
-                    console.log("tName error",tName);
-                    console.log("models error",models);
                     models[tName] = `${tName.charAt(0).toUpperCase() + tName.slice(1)}`
                     createAllFiles(tName, fields)
                 }
