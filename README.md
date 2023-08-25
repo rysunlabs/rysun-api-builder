@@ -8,31 +8,31 @@ The api-builder runs on NodeJS, and it is only for NestJS projects.
 
 ## Installation & Usage
 
-To install this package enter this command on your terminal:
+You can install the package in your project by entering this command on your terminal: 
 ```bash
 npm install @rysun/api-builder
 or
 yarn add @rysun/api-builder
 ```
 
-To use the functionality of this node module in your project you need to run the following command in terminal:
+Run the following command in the terminal, to use the features of this node module in your project: 
 ```bash
 npx generatePrismaAPI
 ```
 
-or else you can download this package globally in your system with this command:
+You can download the package globally in your system with the following command: 
 ```bash
 npm install -g @rysun/api-builder
 or
 yarn global add @rysun/api-builder
 ```
 
-To use the functionality of this node module Globally in your project you need to run the following command in terminal:
+Use the capabilities of the api-builder node module globally in your projects by running the following command: 
 ```bash
 generatePrismaAPI
 ```
 
-After run that command it will ask for some input regarding database and api type like:
+After executing the command, fill in the required input about the database and API type:
 ```
 Database Driver:
 Database name:
