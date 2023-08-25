@@ -1,17 +1,17 @@
 import fs from "fs"
 import { exec, execSync } from "child_process"
-import { moduleTemplate } from './Templates/moduleTemplate'
-import { controllerTemplate } from './Templates/controllerTemplate'
-import { serviceTemplate } from './Templates/serviceTemplate'
-import { createDtoTemplate } from './Templates/createDtoTemplate'
-import { updateDtoTemplate } from './Templates/updateDtoTemplate'
-import { filterDtoTemplate } from './Templates/filterDtoTemplate'
-import { appModuleTemplate } from './Templates/appModuleTemplate'
-import { envTemplate } from './Templates/envTemplate'
-import { mainTemplate } from './Templates/maintemplate'
-import { prismaTemplate } from "./Templates/prismaTemplate"
-import { resolverTemplate } from "./Templates/resolverTemplate"
-import { entityTemplate } from "./Templates/entityTemplate"
+import { moduleTemplate } from './Templates/moduleTemplate.js'
+import { controllerTemplate } from './Templates/controllerTemplate.js'
+import { serviceTemplate } from './Templates/serviceTemplate.js'
+import { createDtoTemplate } from './Templates/createDtoTemplate.js'
+import { updateDtoTemplate } from './Templates/updateDtoTemplate.js'
+import { filterDtoTemplate } from './Templates/filterDtoTemplate.js'
+import { appModuleTemplate } from './Templates/appModuleTemplate.js'
+import { envTemplate } from './Templates/envTemplate.js'
+import { mainTemplate } from './Templates/maintemplate.js'
+import { prismaTemplate } from "./Templates/prismaTemplate.js"
+import { resolverTemplate } from "./Templates/resolverTemplate.js"
+import { entityTemplate } from "./Templates/entityTemplate.js"
 
 interface DatabaseInfo {
     dbName: string,

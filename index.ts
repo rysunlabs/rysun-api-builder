@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import inquirer from "inquirer"
-import { dbConnect } from "./db";
+import { dbConnect } from "./db.js";
 
 // using inquirer we can get the db info from user through command line
 inquirer
