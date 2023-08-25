@@ -7,7 +7,6 @@ import { createDtoTemplate } from './Templates/createDtoTemplate.js'
 import { updateDtoTemplate } from './Templates/updateDtoTemplate.js'
 import { filterDtoTemplate } from './Templates/filterDtoTemplate.js'
 import { appModuleTemplate } from './Templates/appModuleTemplate.js'
-import { envTemplate } from './Templates/envTemplate.js'
 import { mainTemplate } from './Templates/maintemplate.js'
 import { prismaTemplate } from "./Templates/prismaTemplate.js"
 import { resolverTemplate } from "./Templates/resolverTemplate.js"
@@ -76,9 +75,10 @@ export const dbConnect = async (dbInfo: DatabaseInfo) => {
     }
 
     const generate = async (isDiffrence: boolean, diffData?: any, actualData?: any) => {
-        const { PrismaClient } = await import("@prisma/client")
-        const prisma:any = await import("@prisma/client")
         // @ts-ignore
+        const { PrismaClient } = await import("@prisma/client")
+        // @ts-ignore
+        const prisma:any = await import("@prisma/client")
         const prismaClient = new PrismaClient()        
         const modelNames = prisma.Prisma.ModelName
 
@@ -167,9 +167,6 @@ export const dbConnect = async (dbInfo: DatabaseInfo) => {
                 }
             }
         }
-
-        const envResponse = envTemplate(dbInfo)
-        fs.writeFileSync(`./.env`, envResponse)
 
         const appModuleResponse = appModuleTemplate(models)
         fs.writeFileSync(`./src/app.module.ts`, appModuleResponse)
