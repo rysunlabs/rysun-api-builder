@@ -1,15 +1,15 @@
 {
   "name": "@rysun/api-builder",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Auto-generate the CRUD endpoints for MySQL, Postgres, and SQL servers using Prisma. ",
-  "main": "./lib/cjs/index.js",
-  "module": "./lib/esm/index.js",
+  "exports": "./lib/esm/index.js",
+  "type": "module",
   "bin": {
-    "generatePrismaAPI": "./lib/cjs/index.js"
+    "generatePrismaAPI": "./lib/esm/index.js"
   },
   "scripts": {
     "version-select": "version-select",
-    "build": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
+    "build": "tsc -p tsconfig.json",
     "build:watch": "tsc -w"
   },
   "keywords": [
@@ -42,7 +42,7 @@
   "author": "rysun",
   "license": "ISC",
   "devDependencies": {
-    "@types/inquirer": "9.0.2",
+    "@types/inquirer": "^9.0.3",
     "typescript": "^5.2.2"
   },
   "dependencies": {
@@ -55,8 +55,9 @@
     "@nestjs/swagger": "^7.1.8",
     "@prisma/client": "^5.2.0",
     "child_process": "^1.0.2",
-    "inquirer": "8.0.0",
+    "inquirer": "^9.2.10",
     "mysql2": "^3.6.0",
-    "prisma": "^5.2.0"
+    "prisma": "^5.2.0",
+    "version-select": "^1.0.13"
   }
 }

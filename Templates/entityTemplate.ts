@@ -1,4 +1,4 @@
-import { fieldTemplate } from "./fieldTemplate"
+import { fieldTemplate } from "./fieldTemplate.js"
 
 export const entityTemplate = (filename: string, fields: any) => {
 
