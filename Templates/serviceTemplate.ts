@@ -44,13 +44,7 @@ import { Filter${copyClassName}Dto } from './dto/filter-${name}.dto';\n`
 
     let count = 0
     for (let i in fields) {
-        if (dbDriver === "postgresql") {
-            if ((!fields[i]['allowNull'] && !fields[i]['autoIncrement'] && fields[i]["default"] === null)) {
-                count += 1
-            }
-        }
-
-        if (fields[i]["allowNull"] && fields[i]["default"]?.name !== "autoincrement") {
+        if ((fields[i]["allowNull"] && fields[i]["default"]?.name !== "autoincrement") || (dbDriver === "postgresql" && !fields[i]['allowNull'] && !fields[i]['autoIncrement'] && fields[i]["default"] === null)) {
             count += 1
         }
 
