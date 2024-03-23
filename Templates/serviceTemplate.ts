@@ -1,4 +1,4 @@
-export const serviceTemplate = (name: string, fields: any, apiType: string) => {
+export const serviceTemplate = (name: string, fields: any, apiType: string, dbDriver: string) => {
     const fileName = name.charAt(0).toUpperCase() + name.slice(1)
     let copyClassName = fileName
 
@@ -44,6 +44,12 @@ import { Filter${copyClassName}Dto } from './dto/filter-${name}.dto';\n`
 
     let count = 0
     for (let i in fields) {
+        if (dbDriver === "postgresql") {
+            if ((!fields[i]['allowNull'] && !fields[i]['autoIncrement'] && fields[i]["default"] === null)) {
+                count += 1
+            }
+        }
+
         if (fields[i]["allowNull"] && fields[i]["default"]?.name !== "autoincrement") {
             count += 1
         }

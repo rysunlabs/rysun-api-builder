@@ -39,10 +39,10 @@ export const dbConnect = async (dbInfo: DatabaseInfo) => {
         }
 
         if (isUnique) {
-            const createDtoResponse = createDtoTemplate(name, fields, dbInfo.apiType)
+            const createDtoResponse = createDtoTemplate(name, fields, dbInfo.apiType, dbInfo.dbDriver)
             const moduleResponse = moduleTemplate(name, fields, dbInfo.apiType)
             const controllerResponse = controllerTemplate(name, fields)
-            const serviceResponse = serviceTemplate(name, fields, dbInfo.apiType)
+            const serviceResponse = serviceTemplate(name, fields, dbInfo.apiType, dbInfo.dbDriver)
             const updateDtoResponse = updateDtoTemplate(name, fields, dbInfo.apiType)
             const filterDtoResponse = filterDtoTemplate(name, dbInfo.apiType)
             const resolverResponse = resolverTemplate(name, fields)
@@ -122,26 +122,53 @@ export const dbConnect = async (dbInfo: DatabaseInfo) => {
 
         let models: any = {}
         let tName: any
+        const isPostgresql = dbInfo.dbDriver === "postgresql";
         for (tName of Object.values(modelNames)) {
-            const data: any = await prismaClient.$queryRawUnsafe(`SHOW COLUMNS from ${tName}`)
+            const data: any = await prismaClient.$queryRawUnsafe(isPostgresql
+                ? `SELECT column_name, data_type, is_nullable, column_default FROM information_schema.columns 
+                WHERE table_schema = 'public' AND table_name = '${tName}';` 
+                : `SHOW COLUMNS from ${tName}`);
+            
+            // get primary keys for postgresql
+            let primaryKeys: {attname?: string}[] | undefined = undefined;
+            if(isPostgresql) {
+                primaryKeys = await prismaClient.$queryRawUnsafe(`SELECT               
+                pg_attribute.attname, 
+                format_type(pg_attribute.atttypid, pg_attribute.atttypmod) 
+              FROM pg_index, pg_class, pg_attribute, pg_namespace 
+              WHERE 
+                pg_class.oid = '${tName}'::regclass AND 
+                indrelid = pg_class.oid AND 
+                nspname = 'public' AND 
+                pg_class.relnamespace = pg_namespace.oid AND 
+                pg_attribute.attrelid = pg_class.oid AND 
+                pg_attribute.attnum = any(pg_index.indkey)
+               AND indisprimary`)
+            }
             const fields: any = {}
+            const hasPrimaryKeys = isPostgresql && primaryKeys && primaryKeys.length > 0;
             for (let i in data) {
                 // here all fields object create where all the necessary value are stores
+                if(isPostgresql) {
+                    data[i]["Type"] = data[i]["data_type"];
+                }
                 data[i]["Type"] = checkTypes(data[i]["Type"])
                 
-                if (data[i]["Type"].includes('enum')) {
+                if (data[i]["Type"].includes(isPostgresql ? 'USER-DEFINED' : 'enum')) {
                     data[i]["Type"] = "string"
                     data[i]['kind'] = "enum"
                 }
-                data[i]["Null"] = data[i]["Null"] === 'YES'
+                data[i]["Null"] = data[i][isPostgresql ? "is_nullable" : "Null"] === 'YES'
                 if (data[i]["Null"] === 'NO') {
                     data[i]["Null"] = false
                 }
-                fields[data[i]["Field"]] = {
+                fields[data[i][isPostgresql ? "column_name" : "Field"]] = {
                     type: data[i]["Type"],
                     kind: data[i]["kind"],
-                    isPrimary: data[i]["Key"] === 'PRI' ? true : false,
-                    default: data[i]["Default"],
+                    isPrimary: isPostgresql && primaryKeys && primaryKeys.length > 0 
+                        ? primaryKeys.some(item => item && item.attname && item.attname.includes(data[i]["column_name"])) 
+                        : data[i]["Key"] === 'PRI',
+                    default: data[i][isPostgresql ? "column_default" : "Default"],
                     allowNull: data[i]["Null"],
                 }
 
