@@ -9,7 +9,7 @@ inquirer
             type: 'list',
             name: 'dbDriver',
             message: 'Database Driver:',
-            choices: ['mysql', 'postgresql', 'SQL server'],
+            choices: ['mysql', 'postgresql'],
         },
         {
             name: 'dbName',
