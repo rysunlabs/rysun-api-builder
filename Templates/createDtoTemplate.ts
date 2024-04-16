@@ -1,4 +1,4 @@
-export const createDtoTemplate = (name: string, fields: any, apiType: any) => {
+export const createDtoTemplate = (name: string, fields: any, apiType: any, dbDriver: string) => {
     const fileName = name.charAt(0).toUpperCase() + name.slice(1)
     let copyClassName = fileName
     if (fileName.split("-")[1] === "copy") {
@@ -17,7 +17,7 @@ export const createDtoTemplate = (name: string, fields: any, apiType: any) => {
     const fieldsTemplate = (element: any) => {
         let fieldTemplate = ``
         for (let i in element) {
-            if (element[i]['allowNull'] && element[i]["default"]?.name !== "autoincrement") {
+            if (element[i]['allowNull'] && element[i]["default"]?.name !== "autoincrement" || (dbDriver === "postgresql" && !element[i]['allowNull'] && element[i]["default"] === null)) {
                 if (apiType === "GraphQL") {
                     fieldTemplate += `\t@Field()\n`
                 }
