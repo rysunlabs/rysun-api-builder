@@ -11,16 +11,9 @@ import { mainTemplate } from './Templates/maintemplate.js'
 import { prismaTemplate } from "./Templates/prismaTemplate.js"
 import { resolverTemplate } from "./Templates/resolverTemplate.js"
 import { entityTemplate } from "./Templates/entityTemplate.js"
-
-interface DatabaseInfo {
-    dbName: string,
-    dbPort: string,
-    dbUser: string,
-    dbPassword: string,
-    dbHost: string,
-    dbDriver: string,
-    apiType: string
-}
+import path from "path"
+import { DataType, DatabaseInfo} from "./types/index.js"
+import { Prisma, PrismaClient } from "@prisma/client";
 
 export const dbConnect = async (dbInfo: DatabaseInfo) => {
 
@@ -75,13 +68,21 @@ export const dbConnect = async (dbInfo: DatabaseInfo) => {
     }
 
     const generate = async (isDiffrence: boolean, diffData?: any, actualData?: any) => {
+        console.log("hello")
+        // await new Promise((resolve) => setTimeout(resolve, 2000));
         // @ts-ignore
-        const { PrismaClient } = await import("@prisma/client")
+        //const { PrismaClient } = await import("@prisma/client")
+        console.log("hh")
         // @ts-ignore
-        const prisma:any = await import("@prisma/client")
-        const prismaClient = new PrismaClient()        
-        const modelNames = prisma.Prisma.ModelName
-
+       // const prisma:any = await import("@prisma/client")
+        console.log("pp")
+        console.log(PrismaClient)    
+        console.log("prismaclient")    
+        const prismaClient = new PrismaClient() 
+        console.log("gg")       
+        const modelNames = prismaClient.Prisma.ModelName
+        console.log("tt")
+   
         let dataObj: any = {}
         for (let i in modelNames) {
             if (actualData) {
@@ -102,35 +103,44 @@ export const dbConnect = async (dbInfo: DatabaseInfo) => {
         }
 
         // this function check the datatypes for the fields
-        const checkTypes = (value: any) => {
+        const checkTypes = (value: string): DataType => {
             if (value.includes("Int") || value.includes("int") || value.includes("Float") || value.includes("Decimal")) {
                 return 'number'
             }
             else if (value.includes("Date") || value.includes("timestamp") || value.includes("Time") || value.includes("datetime")) {
                 return 'Date'
             }
-            else if (value.includes("Boolean") || value.includes("tinyInt") || value.includes('tinyint')) {
+            else if (value.includes("Boolean") || value.includes("tinyInt") || value.includes('tinyint') || value.includes('bit')) {
                 return 'boolean'
             }
-            else if (value.includes('varchar') || value.includes('text') || value.includes('String') || value.includes('string')) {
+            else if (value.includes('varchar') || value.includes('nvarchar') || value.includes('text') || value.includes('String') || value.includes('string')) {
                 return 'string'
             }
+            else if (value.includes('char') || value.includes('nchar')) {
+                return 'string'; 
+            }
             else {
-                return value
+                return "unknown"
             }
         }
 
         let models: any = {}
         let tName: any
-        const isPostgresql = dbInfo.dbDriver === "postgresql";
+       const isPostgresql = dbInfo.dbDriver === "postgresql";
+       const isMssql = dbInfo.dbDriver === "mssql";
         for (tName of Object.values(modelNames)) {
             const data: any = await prismaClient.$queryRawUnsafe(isPostgresql
                 ? `SELECT column_name, data_type, is_nullable, column_default FROM information_schema.columns 
-                WHERE table_schema = 'public' AND table_name = '${tName}';` 
+                WHERE table_schema = 'public' AND table_name = '${tName}';`
+                : isMssql
+                ? `SELECT COLUMN_NAME as column_name, DATA_TYPE as data_type, IS_NULLABLE as is_nullable, COLUMN_DEFAULT as column_default 
+                FROM INFORMATION_SCHEMA.COLUMNS 
+                WHERE TABLE_NAME = '${tName}';` 
                 : `SHOW COLUMNS from ${tName}`);
             
             // get primary keys for postgresql
-            let primaryKeys: {attname?: string}[] | undefined = undefined;
+            // let primaryKeys: {attname?: string}[] | undefined = undefined;
+            let primaryKeys: { attname?: string; COLUMN_NAME?: string }[] = [];
             if(isPostgresql) {
                 primaryKeys = await prismaClient.$queryRawUnsafe(`SELECT               
                 pg_attribute.attname, 
@@ -143,13 +153,19 @@ export const dbConnect = async (dbInfo: DatabaseInfo) => {
                 pg_class.relnamespace = pg_namespace.oid AND 
                 pg_attribute.attrelid = pg_class.oid AND 
                 pg_attribute.attnum = any(pg_index.indkey)
-               AND indisprimary`)
+               AND indisprimary`) || []
+            }else if (isMssql) {
+                primaryKeys = await prismaClient.$queryRawUnsafe(`
+                    SELECT COLUMN_NAME as attname
+                    FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE 
+                    WHERE OBJECTPROPERTY(OBJECT_ID(CONSTRAINT_SCHEMA + '.' + CONSTRAINT_NAME), 'IsPrimaryKey') = 1 
+                    AND TABLE_NAME = '${tName}';`) || [];
             }
             const fields: any = {}
-            const hasPrimaryKeys = isPostgresql && primaryKeys && primaryKeys.length > 0;
+            const hasPrimaryKeys =  primaryKeys && primaryKeys.length > 0;
             for (let i in data) {
                 // here all fields object create where all the necessary value are stores
-                if(isPostgresql) {
+                if (isPostgresql || isMssql) {
                     data[i]["Type"] = data[i]["data_type"];
                 }
                 data[i]["Type"] = checkTypes(data[i]["Type"])
@@ -158,21 +174,27 @@ export const dbConnect = async (dbInfo: DatabaseInfo) => {
                     data[i]["Type"] = "string"
                     data[i]['kind'] = "enum"
                 }
-                data[i]["Null"] = data[i][isPostgresql ? "is_nullable" : "Null"] === 'YES'
+                data[i]["Null"] = data[i][isPostgresql || isMssql ? "is_nullable" : "Null"] === 'YES'
                 if (data[i]["Null"] === 'NO') {
                     data[i]["Null"] = false
                 }
-                fields[data[i][isPostgresql ? "column_name" : "Field"]] = {
+                const isPrimary = hasPrimaryKeys
+                ? primaryKeys.some(item => 
+                isPostgresql 
+                    ? item?.attname && item.attname.includes(data[i]["column_name"]) 
+                    : isMssql 
+                    ? item?.COLUMN_NAME && item.COLUMN_NAME === data[i]["column_name"]
+                    : data[i]["Key"] === 'PRI'
+                 )
+                 : data[i]["Key"] === 'PRI';
+
+                fields[data[i][isPostgresql || isMssql ? "column_name" : "Field"]] = {
                     type: data[i]["Type"],
                     kind: data[i]["kind"],
-                    isPrimary: isPostgresql && primaryKeys && primaryKeys.length > 0 
-                        ? primaryKeys.some(item => item && item.attname && item.attname.includes(data[i]["column_name"])) 
-                        : data[i]["Key"] === 'PRI',
-                    default: data[i][isPostgresql ? "column_default" : "Default"],
+                    isPrimary: isPrimary,
+                    default: data[i][isPostgresql || isMssql ? "column_default" : "Default"],
                     allowNull: data[i]["Null"],
-                }
-
-
+                };
             }
             if (isDiffrence) {
                 for (let i of diffModelList) {
@@ -205,16 +227,57 @@ export const dbConnect = async (dbInfo: DatabaseInfo) => {
     }
 
     //run prisma commands 
+    const runPrismaCommand = (command: string): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            exec(command, { shell: true as any }, (error, stdout, stderr) => { // Casting shell to 'any'
+                if (error) {
+                    reject(error);
+                } else if (stderr) {
+                    reject(new Error(stderr));
+                } else {
+                    console.log('Current working directory:', process.cwd());
+                    resolve(stdout);
+                }
+            });
+        });
+    };
+    const dbUrl = generateDbConnectionString(dbInfo);
+    const envFilePath = '.env';
+
+console.log(`Connecting to the database using ${dbUrl}`);
+
+// Function to write or update .env file
+const writeOrUpdateEnvFile = (filePath: string, dbUrl: string) => {
+    if (fs.existsSync(filePath)) {
+        // .env file exists, update it
+        const envContent = fs.readFileSync(filePath, 'utf8');
+        const updatedEnvContent = envContent.split('\n')
+            .filter(line => !line.startsWith('DATABASE_URL'))
+            .concat(`DATABASE_URL="${dbUrl}"`)
+            .join('\n');
+        
+        fs.writeFileSync(filePath, updatedEnvContent);
+    } else {
+        // .env file does not exist, create it
+        fs.writeFileSync(filePath, `DATABASE_URL="${dbUrl}"\n`);
+    }
+};
+
+writeOrUpdateEnvFile(envFilePath, dbUrl);
+console.log("ENV file updated..")
     if (!fs.existsSync('./prisma/schema.prisma')) {
         execSync("npx prisma init")
+        //runPrismaCommand("init");
         const prismaResponse = prismaTemplate(dbInfo)
         fs.writeFileSync(`./prisma/schema.prisma`, prismaResponse)
         console.log("after init");
 
         execSync("npx prisma db pull")
+        //runPrismaCommand("db pull");
         console.log("after db pull");
 
-        execSync("npx prisma generate")
+        //execSync("npx prisma generate")
+        await runPrismaCommand('npx prisma generate');
         console.log("after generate");
 
     }
@@ -223,9 +286,11 @@ export const dbConnect = async (dbInfo: DatabaseInfo) => {
         fs.writeFileSync(`./prisma/schema.prisma`, prismaResponse)
 
         execSync("npx prisma db pull")
+        //runPrismaCommand("db pull");
         console.log("after db pull");
 
         execSync("npx prisma generate")
+        //runPrismaCommand("generate");
         console.log("after generate");
 
     }
@@ -260,3 +325,16 @@ export const dbConnect = async (dbInfo: DatabaseInfo) => {
         fs.mkdirSync('./src', { recursive: true });
     }
 }
+
+function generateDbConnectionString(answers: any) {
+    console.log(answers)
+    const { dbDriver, dbUser, dbPassword, dbHost, dbPort, dbName } = answers;
+    if (dbDriver === "mysql") {
+      console.log("inside mysql")
+      return `mysql://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}`;
+    } else if (dbDriver === "postgresql") {
+      return `postgres://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}`;
+    } else {
+      return `sqlserver://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}`;
+    }
+  }

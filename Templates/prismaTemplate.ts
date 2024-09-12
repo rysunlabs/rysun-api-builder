@@ -4,13 +4,16 @@ export const prismaTemplate = (dbInfo: any) => {
     previewFeatures = ["fullTextSearch", "fullTextIndex"]
 }`
 
-    const driverName = dbInfo.dbDriver === "mysql" ? "mysql" : dbInfo.dbDriver === "postgresql" ? "postgresql" : dbInfo.dbDriver === "SQL server" ? "sqlserver" : ""
+    const driverName = dbInfo.dbDriver === "mysql" ? "mysql" : 
+                       dbInfo.dbDriver === "postgresql" ? "postgresql" : 
+                       dbInfo.dbDriver === "SQL server" ? "sqlserver" : ""
 
+    // Encode '@' character for MySQL/PostgreSQL connection strings
     if (dbInfo.dbPassword.includes("@")) {
-        dbInfo.dbPassword = dbInfo.dbPassword.replace("@", "%40")
+        dbInfo.dbPassword = dbInfo.dbPassword.replace("@", "%40");
     }
 
-    // template for prisma.schema file for 'mysql' or 'postgresql'.
+    // Template for MySQL and PostgreSQL
     if (driverName === "mysql" || driverName === "postgresql") {
         template += `
 
@@ -19,16 +22,16 @@ datasource db {
     url      = "${driverName}://${dbInfo.dbUser}:${dbInfo.dbPassword}@${dbInfo.dbHost}/${dbInfo.dbName}"
 }`
     }
-    // template for prisma.schema file for 'sqlserver'.
+    // Template for SQL Server with proper host format and encoding
     else if (driverName === "sqlserver") {
-        dbInfo.dbHost.replace(`"\"`, `\\`)
+        dbInfo.dbHost = dbInfo.dbHost.replace(`\\`, `\\\\`);  // Correctly escape backslashes
         template += `
         
 datasource db {
     provider = "${driverName}"
-    url      = "${driverName}://${dbInfo.dbHost};initialCatalog=sample;database=${dbInfo.dbName};user=${dbInfo.dbUser};password=${dbInfo.dbPassword};trustServerCertificate=true;"
+    url      = "${driverName}://sqlserver://${dbInfo.dbUser}:${dbInfo.dbPassword}@${dbInfo.dbHost};database=${dbInfo.dbName};trustServerCertificate=true;"
 }`
     }
 
-    return template
+    return template;
 }
