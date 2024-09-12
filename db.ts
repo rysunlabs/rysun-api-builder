@@ -12,10 +12,10 @@ import { prismaTemplate } from "./Templates/prismaTemplate.js"
 import { resolverTemplate } from "./Templates/resolverTemplate.js"
 import { entityTemplate } from "./Templates/entityTemplate.js"
 import path from "path"
-import { DataType, DatabaseInfo} from "./types/index.js"
-import { Prisma, PrismaClient } from "@prisma/client";
+import { DataType, DbAnswers} from "./types/index.js"
+import { Prisma, PrismaClient } from "@prisma/client"
 
-export const dbConnect = async (dbInfo: DatabaseInfo) => {
+export const dbConnect = async (dbInfo: DbAnswers) => {
 
     // this function create all files with all structure according to database tables
     const createAllFiles = (name: string, fields: any) => {

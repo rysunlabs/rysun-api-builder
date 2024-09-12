@@ -19,7 +19,7 @@ export const prismaTemplate = (dbInfo: any) => {
 
 datasource db {
     provider = "${driverName}"
-    url      = "${driverName}://${dbInfo.dbUser}:${dbInfo.dbPassword}@${dbInfo.dbHost}/${dbInfo.dbName}"
+    url      = "${driverName}://${dbInfo.dbUser}:${dbInfo.dbPassword}@${dbInfo.dbHost}:${dbInfo.dbPort}/${dbInfo.dbName}"
 }`
     }
     // Template for SQL Server with proper host format and encoding
@@ -29,7 +29,7 @@ datasource db {
         
 datasource db {
     provider = "${driverName}"
-    url      = "${driverName}://sqlserver://${dbInfo.dbUser}:${dbInfo.dbPassword}@${dbInfo.dbHost};database=${dbInfo.dbName};trustServerCertificate=true;"
+    url      = "${driverName}://sqlserver://${dbInfo.dbUser}:${dbInfo.dbPassword}@${dbInfo.dbHost}:${dbInfo.dbPort};database=${dbInfo.dbName};trustServerCertificate=true;"
 }`
     }
 
