@@ -67,21 +67,14 @@ export const dbConnect = async (dbInfo: DbAnswers) => {
         }
     }
 
-    const generate = async (isDiffrence: boolean, diffData?: any, actualData?: any) => {
-        console.log("hello")
+    const generate = async (isDiffrence: boolean, diffData?: any, actualData?: any) => {      
         // await new Promise((resolve) => setTimeout(resolve, 2000));
         // @ts-ignore
-        //const { PrismaClient } = await import("@prisma/client")
-        console.log("hh")
+        //const { PrismaClient } = await import("@prisma/client")       
         // @ts-ignore
-       // const prisma:any = await import("@prisma/client")
-        console.log("pp")
-        console.log(PrismaClient)    
-        console.log("prismaclient")    
-        const prismaClient = new PrismaClient() 
-        console.log("gg")       
-        const modelNames = prismaClient.Prisma.ModelName
-        console.log("tt")
+       // const prisma:any = await import("@prisma/client")       
+        const prismaClient = new PrismaClient()           
+        const modelNames = prismaClient.Prisma.ModelName       
    
         let dataObj: any = {}
         for (let i in modelNames) {
@@ -244,7 +237,6 @@ export const dbConnect = async (dbInfo: DbAnswers) => {
     const dbUrl = generateDbConnectionString(dbInfo);
     const envFilePath = '.env';
 
-console.log(`Connecting to the database using ${dbUrl}`);
 
 // Function to write or update .env file
 const writeOrUpdateEnvFile = (filePath: string, dbUrl: string) => {
@@ -326,11 +318,9 @@ console.log("ENV file updated..")
     }
 }
 
-function generateDbConnectionString(answers: any) {
-    console.log(answers)
+function generateDbConnectionString(answers: any) {   
     const { dbDriver, dbUser, dbPassword, dbHost, dbPort, dbName } = answers;
-    if (dbDriver === "mysql") {
-      console.log("inside mysql")
+    if (dbDriver === "mysql") {    
       return `mysql://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}`;
     } else if (dbDriver === "postgresql") {
       return `postgres://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}`;
