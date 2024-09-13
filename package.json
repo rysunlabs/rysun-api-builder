@@ -1,6 +1,6 @@
 {
   "name": "@rysun/api-builder",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "Auto-generate the CRUD endpoints for MySQL, Postgres, and SQL servers using Prisma. ",
   "exports": "./lib/esm/index.js",
   "type": "module",
