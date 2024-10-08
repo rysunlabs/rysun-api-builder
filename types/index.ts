@@ -1,4 +1,4 @@
-import { Answers as InquirerAnswers }  from "inquirer"
+import { Answers as InquirerAnswers } from "inquirer"
 
 export type DataType = 'number' | 'Date' | 'boolean' | 'string' | 'unknown';
 
@@ -11,3 +11,13 @@ export interface DbAnswers extends InquirerAnswers {
     dbHost: string;
     apiType: 'RestAPI' | 'GraphQL';
 }
+
+export interface DefaultValues {
+    dbDriver?: string;
+    dbName?: string;
+    dbPort?: string;
+    dbUser?: string;
+    dbPassword?: string;
+    dbHost?: string;
+}
+

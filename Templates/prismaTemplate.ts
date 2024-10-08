@@ -4,9 +4,9 @@ export const prismaTemplate = (dbInfo: any) => {
     previewFeatures = ["fullTextSearch", "fullTextIndex"]
 }`
 
-    const driverName = dbInfo.dbDriver === "mysql" ? "mysql" : 
-                       dbInfo.dbDriver === "postgresql" ? "postgresql" : 
-                       dbInfo.dbDriver === "SQL server" ? "sqlserver" : ""
+    const driverName = dbInfo.dbDriver === "mysql" ? "mysql" :
+        dbInfo.dbDriver === "postgresql" ? "postgresql" :
+            dbInfo.dbDriver === "SQL server" ? "sqlserver" : ""
 
     // Encode '@' character for MySQL/PostgreSQL connection strings
     if (dbInfo.dbPassword.includes("@")) {
